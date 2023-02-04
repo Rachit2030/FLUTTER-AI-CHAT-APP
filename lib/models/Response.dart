@@ -62,9 +62,9 @@
 
 class Response {
   int? created;
-  List<Data>? data;
+  List<Data> data = [];
 
-  Response({this.created, this.data});
+  Response({this.created, required this.data});
 
   Response.fromJson(Map<String, dynamic> json) {
     created = json['created'];
@@ -87,9 +87,9 @@ class Response {
 }
 
 class Data {
-  String? url;
+  String url = "";
 
-  Data({this.url});
+  Data({required this.url});
 
   Data.fromJson(Map<String, dynamic> json) {
     url = json['url'];

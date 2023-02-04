@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'dart:convert';
 
-import 'package:ai_chat_app/models/UserRequest.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/Response.dart';
@@ -21,6 +20,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final textInputController = TextEditingController();
   Response dataFromApi = Response(created: 40411, data: []);
+  var dataImageUrl = "";
 
   void createImage(String prompt) async {
     final response = await http.post(
@@ -38,6 +38,7 @@ class _MyAppState extends State<MyApp> {
       // }
       setState(() {
         dataFromApi = Response.fromJson(temp);
+        dataImageUrl = dataFromApi.data.first.url;
       });
     }
     // print(temp)
@@ -66,21 +67,27 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          // mainAxisAlignment: MainAxisAlignment.,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            Spacer(),
             FutureBuilder(
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Container(
-                    child: Image.network("${dataFromApi.data!.first.url}"),
-                  );
-                  // Text("${dataFromApi.data}");
-                } else {
-                  return Text(dataFromApi.created.toString());
-                }
+                if (dataImageUrl != "") {
+                  return Image.network(dataImageUrl);
+                } else
+                  return CircularProgressIndicator();
+                // if (snapshot.hasData) {
+                //   return Container(
+                //     child: Image.network("${dataFromApi.data!.first.url}"),
+                //   );
+                //   // Text("${dataFromApi.data}");
+                // } else {
+                //   return Text(dataFromApi.created.toString());
+                // }
               },
             ),
+            Spacer(),
             Align(
               alignment: Alignment.center,
               child: Row(
@@ -98,7 +105,13 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () => createImage(textInputController.text),
+                    onPressed: () {
+                      setState(() {
+                        dataImageUrl = "";
+                      });
+                      createImage(textInputController.text);
+                      textInputController.text = "";
+                    },
                     child: const Text("Search"),
                   )
                 ],
