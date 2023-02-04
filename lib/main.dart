@@ -20,8 +20,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final textInputController = TextEditingController();
+  Response dataFromApi = Response(created: 404, data: []);
 
-  void createImage(String prompt) async {
+  Future<Response> createImage(String prompt) async {
     final response = await http.post(
       Uri.parse('https://api.openai.com/v1/images/generations'),
       headers: <String, String>{
@@ -31,17 +32,26 @@ class _MyAppState extends State<MyApp> {
       body: jsonEncode({"prompt": prompt, "n": 1, "size": "256x256"}),
     );
     final temp = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      // for (Map<String, dynamic> index in temp) {
+      //   dataFromApi = Response.fromJson(index);
+      // }
+      setState(() {
+        dataFromApi = Response.fromJson(temp);
+      });
+    }
+    return dataFromApi;
     print(temp);
   }
 
-  FutureBuilder<Response> showImage() {
-    return FutureBuilder<Response>(builder: (context, snapshot) {
-      if (snapshot.hasData) {
-        return Text(snapshot.data!.created as String);
-      }
-      return const CircularProgressIndicator();
-    });
-  }
+  // FutureBuilder<Response> showImage() {
+  //   return FutureBuilder<Response>(builder: (context, snapshot) {
+  //     if (snapshot.hasData) {
+  //       return Text(snapshot.data!.created as String);
+  //     }
+  //     return const CircularProgressIndicator();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +67,14 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            showImage(),
+            FutureBuilder(
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(dataFromApi.created as String);
+                }
+                return Text("Error");
+              },
+            ),
             Align(
               alignment: Alignment.center,
               child: Row(

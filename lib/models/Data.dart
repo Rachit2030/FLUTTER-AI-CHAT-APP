@@ -1,3 +1,3 @@
-class Data {
-  String url = "";
-}
+// class Data {
+//   String url = "";
+// }
