@@ -20,9 +20,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final textInputController = TextEditingController();
-  Response dataFromApi = Response(created: 404, data: []);
+  Response dataFromApi = Response(created: 40411, data: []);
 
-  Future<Response> createImage(String prompt) async {
+  void createImage(String prompt) async {
     final response = await http.post(
       Uri.parse('https://api.openai.com/v1/images/generations'),
       headers: <String, String>{
@@ -40,8 +40,10 @@ class _MyAppState extends State<MyApp> {
         dataFromApi = Response.fromJson(temp);
       });
     }
-    return dataFromApi;
-    print(temp);
+    // print(temp)
+    print(dataFromApi.created);
+    print(dataFromApi.data?.first.url);
+    // return dataFromApi;
   }
 
   // FutureBuilder<Response> showImage() {
@@ -64,15 +66,19 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             FutureBuilder(
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Text(dataFromApi.created as String);
+                  return Container(
+                    child: Image.network("${dataFromApi.data!.first.url}"),
+                  );
+                  // Text("${dataFromApi.data}");
+                } else {
+                  return Text(dataFromApi.created.toString());
                 }
-                return Text("Error");
               },
             ),
             Align(
