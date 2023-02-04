@@ -1,4 +1,12 @@
+import 'package:ai_chat_app/network/ApiData.dart';
 import 'package:flutter/material.dart';
+
+import 'dart:convert';
+
+import 'package:ai_chat_app/models/UserRequest.dart';
+import 'package:http/http.dart' as http;
+
+import '../models/Response.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +22,29 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final textInputController = TextEditingController();
 
+  void createImage(String prompt) async {
+    final response = await http.post(
+      Uri.parse('https://api.openai.com/v1/images/generations'),
+      headers: <String, String>{
+        "Content-Type": "application/json",
+        "Authorization":
+            "Bearer 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"
+      },
+      body: jsonEncode({"prompt": prompt, "n": 1, "size": "256x256"}),
+    );
+    final temp = jsonDecode(response.body);
+    print(temp);
+  }
+
+  FutureBuilder<Response> showImage() {
+    return FutureBuilder<Response>(builder: (context, snapshot) {
+      if (snapshot.hasData) {
+        return Text(snapshot.data!.created as String);
+      }
+      return const CircularProgressIndicator();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,6 +59,7 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            showImage(),
             Align(
               alignment: Alignment.center,
               child: Row(
@@ -40,12 +72,12 @@ class _MyAppState extends State<MyApp> {
                       controller: textInputController,
                       keyboardType: TextInputType.text,
                       decoration: const InputDecoration(
-                        labelText: "Enter the word to search",
-                      ),
+                          labelText: "Enter the word to search",
+                          border: OutlineInputBorder()),
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => createImage(textInputController.text),
                     child: const Text("Search"),
                   )
                 ],
