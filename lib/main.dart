@@ -1,4 +1,5 @@
 import 'package:ai_chat_app/network/ApiData.dart';
+import 'package:ai_chat_app/widgets/ApiImage.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
@@ -21,6 +22,8 @@ class _MyAppState extends State<MyApp> {
   final textInputController = TextEditingController();
   Response dataFromApi = Response(created: 40411, data: []);
   var dataImageUrl = "";
+  var dataImagePrompt = "";
+  var isLoading = true;
 
   void createImage(String prompt) async {
     final response = await http.post(
@@ -43,7 +46,7 @@ class _MyAppState extends State<MyApp> {
     }
     // print(temp)
     print(dataFromApi.created);
-    print(dataFromApi.data?.first.url);
+    print(dataFromApi.data.first.url);
     // return dataFromApi;
   }
 
@@ -74,9 +77,14 @@ class _MyAppState extends State<MyApp> {
             FutureBuilder(
               builder: (context, snapshot) {
                 if (dataImageUrl != "") {
-                  return Image.network(dataImageUrl);
-                } else
-                  return CircularProgressIndicator();
+                  return ImageFromApi(
+                      dataPrompt: dataImagePrompt, dataImage: dataImageUrl);
+                } else {
+                  if (isLoading) {
+                    return Container();
+                  } else
+                    return CircularProgressIndicator();
+                }
                 // if (snapshot.hasData) {
                 //   return Container(
                 //     child: Image.network("${dataFromApi.data!.first.url}"),
@@ -108,6 +116,8 @@ class _MyAppState extends State<MyApp> {
                     onPressed: () {
                       setState(() {
                         dataImageUrl = "";
+                        dataImagePrompt = textInputController.text;
+                        isLoading = false;
                       });
                       createImage(textInputController.text);
                       textInputController.text = "";
