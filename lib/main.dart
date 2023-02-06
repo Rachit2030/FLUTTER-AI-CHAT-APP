@@ -63,6 +63,7 @@ class _MyAppState extends State<MyApp> {
   var dataImagePrompt = "";
   var isLoading = true;
   var isShowingHistory = true;
+  List<Map<String, dynamic>> data = [];
 
   void createImage(String prompt) async {
     final response = await http.post(
@@ -105,6 +106,17 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> getData() async {
+    final allRows = await dbHelper.queryAllRows();
+    // debugPrint('query all rows:');
+    // for (final row in allRows) {
+    //   debugPrint(row.toString());
+    // }
+    setState(() {
+      data = allRows;
+    });
+  }
+
   void insert() async {
     // row to insert
     Map<String, dynamic> row = {
@@ -135,6 +147,7 @@ class _MyAppState extends State<MyApp> {
               onPressed: () {
                 setState(() {
                   isShowingHistory = !isShowingHistory;
+                  getData();
                 });
               },
               icon: isShowingHistory ? Icon(Icons.history) : Icon(Icons.home),
@@ -205,7 +218,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ],
               )
-            : HistoryList(),
+            : HistoryList(data: data),
       ),
     );
   }
