@@ -1,5 +1,6 @@
 import 'package:ai_chat_app/network/ApiData.dart';
 import 'package:ai_chat_app/widgets/ApiImage.dart';
+import 'package:ai_chat_app/widgets/historyList.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
@@ -24,6 +25,7 @@ class _MyAppState extends State<MyApp> {
   var dataImageUrl = "";
   var dataImagePrompt = "";
   var isLoading = true;
+  var isShowingHistory = false;
 
   void createImage(String prompt) async {
     final response = await http.post(
@@ -64,73 +66,83 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text("AI CHAT APP"),
+          title: isShowingHistory ? Text("AI CHAT APP") : Text("HISTORY"),
           actions: <Widget>[
-            IconButton(onPressed: () {}, icon: const Icon(Icons.history)),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  isShowingHistory = !isShowingHistory;
+                });
+              },
+              icon: isShowingHistory ? Icon(Icons.history) : Icon(Icons.home),
+            ),
           ],
         ),
-        body: Column(
-          // mainAxisAlignment: MainAxisAlignment.,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Spacer(),
-            FutureBuilder(
-              builder: (context, snapshot) {
-                if (dataImageUrl != "") {
-                  return ImageFromApi(
-                      dataPrompt: dataImagePrompt, dataImage: dataImageUrl);
-                } else {
-                  if (isLoading) {
-                    return Container();
-                  } else
-                    return CircularProgressIndicator();
-                }
-                // if (snapshot.hasData) {
-                //   return Container(
-                //     child: Image.network("${dataFromApi.data!.first.url}"),
-                //   );
-                //   // Text("${dataFromApi.data}");
-                // } else {
-                //   return Text(dataFromApi.created.toString());
-                // }
-              },
-            ),
-            Spacer(),
-            Align(
-              alignment: Alignment.center,
-              child: Row(
+        body: (isShowingHistory)
+            ? Column(
+                // mainAxisAlignment: MainAxisAlignment.,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Spacer(),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    alignment: Alignment.center,
-                    width: 300,
-                    child: TextField(
-                      controller: textInputController,
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                          labelText: "Enter the word to search",
-                          border: OutlineInputBorder()),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        dataImageUrl = "";
-                        dataImagePrompt = textInputController.text;
-                        isLoading = false;
-                      });
-                      createImage(textInputController.text);
-                      textInputController.text = "";
+                  FutureBuilder(
+                    builder: (context, snapshot) {
+                      if (dataImageUrl != "") {
+                        return ImageFromApi(
+                            dataPrompt: dataImagePrompt,
+                            dataImage: dataImageUrl);
+                      } else {
+                        if (isLoading) {
+                          return Container();
+                        } else
+                          return CircularProgressIndicator();
+                      }
+                      // if (snapshot.hasData) {
+                      //   return Container(
+                      //     child: Image.network("${dataFromApi.data!.first.url}"),
+                      //   );
+                      //   // Text("${dataFromApi.data}");
+                      // } else {
+                      //   return Text(dataFromApi.created.toString());
+                      // }
                     },
-                    child: const Text("Search"),
                   ),
                   Spacer(),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Row(
+                      children: <Widget>[
+                        Spacer(),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          alignment: Alignment.center,
+                          width: 300,
+                          child: TextField(
+                            controller: textInputController,
+                            keyboardType: TextInputType.text,
+                            decoration: const InputDecoration(
+                                labelText: "Enter the word to search",
+                                border: OutlineInputBorder()),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              dataImageUrl = "";
+                              dataImagePrompt = textInputController.text;
+                              isLoading = false;
+                            });
+                            createImage(textInputController.text);
+                            textInputController.text = "";
+                          },
+                          child: const Text("Search"),
+                        ),
+                        Spacer(),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
-            ),
-          ],
-        ),
+              )
+            : HistoryList(),
       ),
     );
   }
