@@ -100,6 +100,7 @@ class _MyAppState extends State<MyApp> {
               alignment: Alignment.center,
               child: Row(
                 children: <Widget>[
+                  Spacer(),
                   Container(
                     padding: const EdgeInsets.all(20),
                     alignment: Alignment.center,
@@ -123,10 +124,11 @@ class _MyAppState extends State<MyApp> {
                       textInputController.text = "";
                     },
                     child: const Text("Search"),
-                  )
+                  ),
+                  Spacer(),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
