@@ -6,11 +6,48 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../models/Response.dart';
 import './network/apikey.dart';
+import 'models/DBData.dart';
+import 'network/databaseHelper.dart';
 
-void main() {
+final dbHelper = DatabaseHelper();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // final database = openDatabase(
+  //   join(await getDatabasesPath(), 'DBData.dart'),
+  //   onCreate: (db, version) {
+  //     return db.execute(
+  //       'CREATE TABLE ImageData(created INTEGER PRIMARY KEY, prompt TEXT, url TEXT)',
+  //     );
+  //   },
+  //   version: 1,
+  // );
+
+  // Future<void> insert(DBData dBData) async {
+  //   final db = await database;
+
+  //   await db.insert('ImageData', dBData.toMap(),
+  //       conflictAlgorithm: ConflictAlgorithm.replace);
+  // }
+
+  // Future<List<DBData>> getData(DBData dBData) async {
+  //   final db = await database;
+  //   final List<Map<String, dynamic>> maps = await db.query('dogs');
+
+  //   return List.generate(maps.length, (i) {
+  //     return DBData(
+  //       created: maps[i]['created'],
+  //       prompt: maps[i]['prompt'],
+  //       url: maps[i]['url'],
+  //     );
+  //   });
+  // }
+  await dbHelper.init();
   runApp(MyApp());
 }
 
@@ -25,7 +62,7 @@ class _MyAppState extends State<MyApp> {
   var dataImageUrl = "";
   var dataImagePrompt = "";
   var isLoading = true;
-  var isShowingHistory = false;
+  var isShowingHistory = true;
 
   void createImage(String prompt) async {
     final response = await http.post(
@@ -49,9 +86,35 @@ class _MyAppState extends State<MyApp> {
     // print(temp)
     print(dataFromApi.created);
     print(dataFromApi.data.first.url);
+
+    var data = DBData(
+        created: dataFromApi.created!.toInt(),
+        prompt: prompt,
+        url: dataFromApi.data.first.url);
     // return dataFromApi;
+
+    insert();
+    query();
   }
 
+  void query() async {
+    final allRows = await dbHelper.queryAllRows();
+    debugPrint('query all rows:');
+    for (final row in allRows) {
+      debugPrint(row.toString());
+    }
+  }
+
+  void insert() async {
+    // row to insert
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnCreated: dataFromApi.created,
+      DatabaseHelper.columnPrompt: dataImagePrompt,
+      DatabaseHelper.columnUrl: dataFromApi.data.first.url
+    };
+    final id = await dbHelper.insert(row);
+    debugPrint('inserted row id: $id');
+  }
   // FutureBuilder<Response> showImage() {
   //   return FutureBuilder<Response>(builder: (context, snapshot) {
   //     if (snapshot.hasData) {
