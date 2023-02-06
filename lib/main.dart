@@ -17,36 +17,6 @@ import 'network/databaseHelper.dart';
 final dbHelper = DatabaseHelper();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // final database = openDatabase(
-  //   join(await getDatabasesPath(), 'DBData.dart'),
-  //   onCreate: (db, version) {
-  //     return db.execute(
-  //       'CREATE TABLE ImageData(created INTEGER PRIMARY KEY, prompt TEXT, url TEXT)',
-  //     );
-  //   },
-  //   version: 1,
-  // );
-
-  // Future<void> insert(DBData dBData) async {
-  //   final db = await database;
-
-  //   await db.insert('ImageData', dBData.toMap(),
-  //       conflictAlgorithm: ConflictAlgorithm.replace);
-  // }
-
-  // Future<List<DBData>> getData(DBData dBData) async {
-  //   final db = await database;
-  //   final List<Map<String, dynamic>> maps = await db.query('dogs');
-
-  //   return List.generate(maps.length, (i) {
-  //     return DBData(
-  //       created: maps[i]['created'],
-  //       prompt: maps[i]['prompt'],
-  //       url: maps[i]['url'],
-  //     );
-  //   });
-  // }
   await dbHelper.init();
   runApp(MyApp());
 }
