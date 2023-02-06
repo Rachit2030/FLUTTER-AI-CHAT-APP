@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:loading_gifs/loading_gifs.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class ImageFromApi extends StatelessWidget {
