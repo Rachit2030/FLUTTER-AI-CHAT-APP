@@ -18,10 +18,12 @@ final dbHelper = DatabaseHelper();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dbHelper.init();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -109,6 +111,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
       home: Scaffold(
         appBar: AppBar(
           title: isShowingHistory ? Text("AI CHAT APP") : Text("HISTORY"),
